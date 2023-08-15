@@ -1,10 +1,13 @@
 #pragma once
 #include <iostream>
 #include <fstream>
+#include <ostream>
 #include <vector>
 #include <string>
 #include <ctime>
+#include <memory>
 #include <experimental/filesystem>
+#include <jsoncpp/json/json.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -114,9 +117,9 @@ namespace Cloud
                 std::cout << "SetContent::open file failed" << std::endl;
                 return false;
             }
-            //写入
+            // 写入
             ofs.write(&body[0], body.size());
-            if(!ofs.good())
+            if (!ofs.good())
             {
                 std::cout << "SetContent::Set content error" << std::endl;
                 ofs.close();
@@ -129,7 +132,7 @@ namespace Cloud
         {
             // 1. 获取原文件内容
             std::string oriBody;
-            if(!GetContent(&oriBody))
+            if (!GetContent(&oriBody))
             {
                 std::cout << "Compress::Get original content failed" << std::endl;
                 return false;
@@ -138,7 +141,7 @@ namespace Cloud
             std::string packedBody = bundle::pack(bundle::LZIP, oriBody);
             // 3. 向新文件中写入
             FileUtil packedfile(packedName);
-            if(!packedfile.SetContent(packedBody))
+            if (!packedfile.SetContent(packedBody))
             {
                 std::cout << "Compress::Set packed content failed" << std::endl;
                 return false;
@@ -150,7 +153,7 @@ namespace Cloud
         {
             // 1. 读取解压文件的内容
             std::string packedBody;
-            if(!GetContent(&packedBody))
+            if (!GetContent(&packedBody))
             {
                 std::cout << "Uncompress::Get packed content failed" << std::endl;
                 return false;
@@ -160,7 +163,7 @@ namespace Cloud
             oriBody = bundle::unpack(packedBody);
             // 3. 将解压缩的内容重新放入新文件
             FileUtil unpackedfile(unpackedName);
-            if(!unpackedfile.SetContent(oriBody))
+            if (!unpackedfile.SetContent(oriBody))
             {
                 std::cout << "Uncompress::Set original content falied" << std::endl;
                 return false;
@@ -176,20 +179,22 @@ namespace Cloud
         // 创建目录
         bool CreateDirectory()
         {
-            //给定路径, 创建目录
-            // 如果路径已经存在
-            if(Exists()) return true;
+            // 给定路径, 创建目录
+            //  如果路径已经存在
+            if (Exists())
+                return true;
             // 路径不存在时, 创建路径
             return fs::create_directory(_FileName);
         }
         // 遍历目录中的文件
-        bool ScanDirectory(std::vector<std::string>* array)
+        bool ScanDirectory(std::vector<std::string> *array)
         {
             // 获取当前路径下所有的目录和文件
-            for(auto& p : fs::directory_iterator(_FileName))
+            for (auto &p : fs::directory_iterator(_FileName))
             {
                 //  如果是路径就跳过
-                if(fs::is_directory(p)) continue;
+                if (fs::is_directory(p))
+                    continue;
                 // 把文件内容放入vector
                 array->push_back(fs::path(p).relative_path().string());
             }
@@ -198,5 +203,36 @@ namespace Cloud
 
     private:
         std::string _FileName;
+    };
+
+    class JsonUtil
+    {
+    public:
+        static bool Serialize(const Json::Value& root, std::string* str)
+        {
+            Json::StreamWriterBuilder swb;
+            std::unique_ptr<Json::StreamWriter> sw(swb.newStreamWriter());
+            std::stringstream ss;
+            if(sw->write(root, &ss) != 0)
+            {
+                std::cout << "Json::Serialize error" << std::endl;
+                return false;
+            }
+            *str = ss.str();
+            return true;
+        }
+
+        static bool Deserialize(const std::string& str, Json::Value* root)
+        {
+            Json::CharReaderBuilder crb;
+            std::unique_ptr<Json::CharReader> cr(crb.newCharReader());
+            std::string errStr;
+            if(!cr->parse(str.c_str(), str.c_str() + str.size(), root, &errStr))
+            {
+                std::cout << "Json::Deserialize error" << std::endl;
+                return false;
+            }
+            return true;
+        }
     };
 }
