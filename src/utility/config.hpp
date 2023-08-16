@@ -73,7 +73,7 @@ namespace Cloud
                 std::cout << "ReadConfig::Get config content failed" << std::endl;
                 return false;
             }
-            std::cout << configBody << std::endl;
+            //std::cout << configBody << std::endl;
 
             Json::Value root;
             if (!JsonUtil::Deserialize(configBody, &root))
