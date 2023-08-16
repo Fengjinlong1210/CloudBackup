@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <cstdio>
 #include <fstream>
 #include <ostream>
 #include <vector>
@@ -201,6 +202,20 @@ namespace Cloud
             return true;
         }
 
+        bool Remove()
+        {
+            if(!Exists)
+            {
+                std::cout << "FileUtil::Remove failed: file not found" << std::endl;
+                return false;
+            }
+            if(remove(FileName().c_str()) != 0)
+            {
+                std::cout << "FileUtil::Remove::remove failed" << std::endl;
+                return false;
+            }
+            return true;
+        }
     private:
         std::string _FileName;
     };
