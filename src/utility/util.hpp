@@ -21,7 +21,7 @@ namespace Cloud
     {
     public:
         FileUtil(const std::string &filename)
-            : _FileName(filename)
+            : _filename(filename)
         {
         }
         // 获取文件大小
@@ -29,7 +29,7 @@ namespace Cloud
         {
             // int stat(const char *path, struct stat *buf);
             struct stat st;
-            int ret = stat(_FileName.c_str(), &st);
+            int ret = stat(_filename.c_str(), &st);
             if (ret < 0)
             {
                 std::cout << "FileSize::get file size failed" << std::endl;
@@ -41,7 +41,7 @@ namespace Cloud
         time_t LastAccessTime()
         {
             struct stat st;
-            int ret = stat(_FileName.c_str(), &st);
+            int ret = stat(_filename.c_str(), &st);
             if (ret < 0)
             {
                 std::cout << "LastAccessTime::get last access time failed" << std::endl;
@@ -53,7 +53,7 @@ namespace Cloud
         time_t LastModifyTime()
         {
             struct stat st;
-            int ret = stat(_FileName.c_str(), &st);
+            int ret = stat(_filename.c_str(), &st);
             if (ret < 0)
             {
                 std::cout << "LastModifyTime::get last modify time failed" << std::endl;
@@ -61,15 +61,15 @@ namespace Cloud
             }
             return st.st_mtime;
         }
-        // 获取文件名
+        // 截取最后的文件名
         std::string FileName()
         {
-            auto pos = _FileName.rfind('/');
+            auto pos = _filename.rfind('/');
             if (pos == std::string::npos)
             {
-                return _FileName;
+                return _filename;
             }
-            return _FileName.substr(pos + 1);
+            return _filename.substr(pos + 1);
         }
         // 获取指定位置开始制定长度的内容
         bool GetPosLen(std::string *body, size_t pos, size_t len)
@@ -83,7 +83,7 @@ namespace Cloud
             }
             // 打开文件
             std::ifstream ifs;
-            ifs.open(FileName().c_str(), std::ios::binary);
+            ifs.open(_filename, std::ios::binary);
             if (!ifs.is_open())
             {
                 std::cout << "GetPosLen::open file failed" << std::endl;
@@ -112,7 +112,7 @@ namespace Cloud
         {
             std::ofstream ofs;
             // 打开文件
-            ofs.open(FileName(), std::ios::binary);
+            ofs.open(_filename, std::ios::binary);
             if (!ofs.is_open())
             {
                 std::cout << "SetContent::open file failed" << std::endl;
@@ -175,7 +175,7 @@ namespace Cloud
         bool Exists()
         {
             // 判断路径是否存在
-            return fs::exists(_FileName);
+            return fs::exists(_filename);
         }
         // 创建目录
         bool CreateDirectory()
@@ -185,13 +185,13 @@ namespace Cloud
             if (Exists())
                 return true;
             // 路径不存在时, 创建路径
-            return fs::create_directory(_FileName);
+            return fs::create_directory(_filename);
         }
         // 遍历目录中的文件
         bool ScanDirectory(std::vector<std::string> *array)
         {
             // 获取当前路径下所有的目录和文件
-            for (auto &p : fs::directory_iterator(_FileName))
+            for (auto &p : fs::directory_iterator(_filename))
             {
                 //  如果是路径就跳过
                 if (fs::is_directory(p))
@@ -204,20 +204,21 @@ namespace Cloud
 
         bool Remove()
         {
-            if(!Exists)
+            if(!Exists())
             {
                 std::cout << "FileUtil::Remove failed: file not found" << std::endl;
                 return false;
             }
-            if(remove(FileName().c_str()) != 0)
+            if(remove(_filename.c_str()) != 0)
             {
                 std::cout << "FileUtil::Remove::remove failed" << std::endl;
                 return false;
             }
             return true;
         }
-    private:
-        std::string _FileName;
+    //private:
+    public:
+        std::string _filename;
     };
 
     class JsonUtil

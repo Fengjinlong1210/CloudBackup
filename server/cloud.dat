@@ -1,0 +1,11 @@
+[
+	{
+		"_atime" : 1692262498,
+		"_fsize" : 269,
+		"_mtime" : 1692262498,
+		"_pack_flag" : 0,
+		"_pack_path" : "./packdir/test.html.lz",
+		"_real_path" : "./backdir/test.html",
+		"_url" : "/download/test.html"
+	}
+]
