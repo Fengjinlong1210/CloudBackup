@@ -45,10 +45,10 @@ namespace Cloud
     };
 
     // 数据管理: 依赖读写锁、数据存储文件、hash
-    class DateManager
+    class DataManager
     {
     public:
-        DateManager()
+        DataManager()
         {
             // 获取备份文件名, 初始化锁, 加载文件内容
             _backup_file = Config::GetInstance()->GetBackupFile();
@@ -169,7 +169,7 @@ namespace Cloud
                 }
             }
             pthread_rwlock_unlock(&_lock);
-            std::cout << "GetOneByURL:: Get BackupInfo by real path failed" << std::endl;
+            std::cout << "GetOneByURL:: Get BackupInfo by real path failed, backupinfo not" << std::endl;
             return false;
         }
 
