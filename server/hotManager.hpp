@@ -3,6 +3,8 @@
 #include "util.hpp"
 #include "dataManager.hpp"
 #include "config.hpp"
+#include "task.hpp"
+#include "threadPool.hpp"
 
 // 热点文件管理模块, 热点文件: 在一定时间内访问过的文件
 // 当一个文件超过一定时间没有访问时, 该文件不再是热点文件, 需要对该文件进行压缩
@@ -56,10 +58,13 @@ namespace Cloud
                         info.NewBackupInfo(file);
                     }
                     // 4. 需要对其进行压缩
+                    std::cout << "需要进行压缩" << std::endl;
                     FileUtil tmp(file);
-                    tmp.Compress(info._pack_path); // 备份信息中保存了该文件压缩后的路径
+                    Task task(tmp, info._pack_path);
+                    std::cout << "pack path = " << info._pack_path << std::endl;
+                    ThreadPool<Task>::GetInstance()->PushTask(task);
+                    //tmp.Compress(info._pack_path); // 备份信息中保存了该文件压缩后的路径
                     // 5. 删除原文件, 存放压缩文件
-                    tmp.Remove();
                     info._pack_flag = true;
                     _dataMgr->Update(info);
                 }
