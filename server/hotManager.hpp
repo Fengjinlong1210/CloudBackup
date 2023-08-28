@@ -58,10 +58,8 @@ namespace Cloud
                         info.NewBackupInfo(file);
                     }
                     // 4. 需要对其进行压缩
-                    std::cout << "需要进行压缩" << std::endl;
                     FileUtil tmp(file);
                     Task task(tmp, info._pack_path);
-                    std::cout << "pack path = " << info._pack_path << std::endl;
                     ThreadPool<Task>::GetInstance()->PushTask(task);
                     //tmp.Compress(info._pack_path); // 备份信息中保存了该文件压缩后的路径
                     // 5. 删除原文件, 存放压缩文件
