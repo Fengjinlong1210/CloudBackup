@@ -20,6 +20,7 @@ namespace Cloud
     class FileUtil
     {
     public:
+        FileUtil() {}
         FileUtil(const std::string &filename)
             : _filename(filename)
         {
@@ -76,6 +77,7 @@ namespace Cloud
         {
             // 判断大小
             size_t fsize = FileSize();
+            std::cout << "fsize = " << fsize << std::endl;
             if (pos + len > fsize)
             {
                 std::cout << "GetPosLen::get content from pos failed" << std::endl;
@@ -83,9 +85,12 @@ namespace Cloud
             }
             // 打开文件
             std::ifstream ifs;
+            ifs.clear();
             ifs.open(_filename, std::ios::binary);
+            std::cout << _filename << std::endl;
             if (!ifs.is_open())
             {
+                std::cout << strerror(errno) << std::endl;
                 std::cout << "GetPosLen::open file failed" << std::endl;
                 return false;
             }
@@ -204,19 +209,19 @@ namespace Cloud
 
         bool Remove()
         {
-            if(!Exists())
+            if (!Exists())
             {
                 std::cout << "FileUtil::Remove failed: file not found" << std::endl;
                 return false;
             }
-            if(remove(_filename.c_str()) != 0)
+            if (remove(_filename.c_str()) != 0)
             {
                 std::cout << "FileUtil::Remove::remove failed" << std::endl;
                 return false;
             }
             return true;
         }
-    //private:
+        // private:
     public:
         std::string _filename;
     };
@@ -224,12 +229,12 @@ namespace Cloud
     class JsonUtil
     {
     public:
-        static bool Serialize(const Json::Value& root, std::string* str)
+        static bool Serialize(const Json::Value &root, std::string *str)
         {
             Json::StreamWriterBuilder swb;
             std::unique_ptr<Json::StreamWriter> sw(swb.newStreamWriter());
             std::stringstream ss;
-            if(sw->write(root, &ss) != 0)
+            if (sw->write(root, &ss) != 0)
             {
                 std::cout << "Json::Serialize error" << std::endl;
                 return false;
@@ -238,12 +243,12 @@ namespace Cloud
             return true;
         }
 
-        static bool Deserialize(const std::string& str, Json::Value* root)
+        static bool Deserialize(const std::string &str, Json::Value *root)
         {
             Json::CharReaderBuilder crb;
             std::unique_ptr<Json::CharReader> cr(crb.newCharReader());
             std::string errStr;
-            if(!cr->parse(str.c_str(), str.c_str() + str.size(), root, &errStr))
+            if (!cr->parse(str.c_str(), str.c_str() + str.size(), root, &errStr))
             {
                 std::cout << "Json::Deserialize error" << std::endl;
                 return false;
