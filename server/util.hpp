@@ -77,7 +77,6 @@ namespace Cloud
         {
             // 判断大小
             size_t fsize = FileSize();
-            std::cout << "fsize = " << fsize << std::endl;
             if (pos + len > fsize)
             {
                 std::cout << "GetPosLen::get content from pos failed" << std::endl;
@@ -87,7 +86,6 @@ namespace Cloud
             std::ifstream ifs;
             ifs.clear();
             ifs.open(_filename, std::ios::binary);
-            std::cout << _filename << std::endl;
             if (!ifs.is_open())
             {
                 std::cout << strerror(errno) << std::endl;
