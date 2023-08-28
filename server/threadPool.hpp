@@ -52,12 +52,9 @@ namespace Cloud
     public:
         void PushTask(const T &task)
         {
-            std::cout << "push" << std::endl;
             std::lock_guard<std::mutex> lock(_mutex);
-            std::cout << "获取锁成功" << std::endl;
             // 向任务队列推送任务
             _tasks.push(task);
-            std::cout << "tasks.size = " << _tasks.size() << std::endl;
             // 唤醒线程执行任务
             _cond.notify_one();
         }
@@ -89,7 +86,6 @@ namespace Cloud
                         return;
                     // 跳出循环时, 已经存在任务
                     task = ptr->PopTask();
-                    std::cout << "get a task" << std::endl;
                 }
                 task();
             }
