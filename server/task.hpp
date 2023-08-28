@@ -16,7 +16,6 @@ namespace Cloud
         {
             std::cout << "compress" << std::endl;
             _util.Compress(_pack_path);
-            
             _util.Remove();
         }
 
